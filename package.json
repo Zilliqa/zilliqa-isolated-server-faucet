@@ -7,6 +7,7 @@
     "@zilliqa-js/crypto": "^0.8.9",
     "@zilliqa-js/util": "^0.8.8",
     "@zilliqa-js/zilliqa": "^0.8.9",
+    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "fs-extra": "^8.1.0",

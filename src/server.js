@@ -3,12 +3,14 @@ import express from "express";
 import bodyParser from "body-parser";
 import fs from "fs-extra";
 import { registerUser, deployFaucet, getState } from './faucet';
+import cors from "cors";
 
 require('dotenv').config()
 
 const FAUCET_PORT = process.env.FAUCET_PORT;
 
 const app = express();
+app.use(cors());
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
