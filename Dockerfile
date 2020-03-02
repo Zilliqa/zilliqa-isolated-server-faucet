@@ -8,5 +8,7 @@ WORKDIR /faucet
 RUN npm install
 RUN npm run build
 
+EXPOSE 5556
+
 ENV DEPLOY_ENV=${DEPLOY_ENV}
 ENTRYPOINT ["sh", "run_server.sh"]
