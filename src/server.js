@@ -2,7 +2,7 @@ import 'babel-polyfill';
 import express from "express";
 import bodyParser from "body-parser";
 import fs from "fs-extra";
-import { registerUser, deployFaucet, getState } from './faucet';
+import { registerUser, requestFunds, deployFaucet, getState } from './faucet';
 import cors from "cors";
 
 require('dotenv').config()
@@ -20,6 +20,17 @@ app.post('/register-account', async (req, res) => {
 
     try {
         const result = await registerUser(address);
+        return res.send(result);
+    } catch (error) {
+        return res.send(error);
+    }
+});
+
+app.post('/request-funds', async (req, res) => {
+    const address = req.body.address;
+
+    try {
+        const result = await requestFunds(address);
         return res.send(result);
     } catch (error) {
         return res.send(error);

@@ -56,6 +56,44 @@ const registerUser = async (user_address) => {
     }
 }
 
+const requestFunds = async (user_address) => {
+    try {
+        const faucetFile = fs.readJSONSync('./faucet-state.json');
+
+        const zilliqa = new Zilliqa(process.env.ISOLATED_URL);
+
+        zilliqa.wallet.addByPrivateKey(PRIVATE_KEY);
+
+        const myGasPrice = units.toQa('1000', units.Units.Li);
+
+        const tx = zilliqa.transactions.new({
+            version: VERSION,
+            toAddr: faucetFile.contractAddress,
+            amount: new BN(0),
+            gasPrice: myGasPrice, // in Qa
+            gasLimit: Long.fromNumber(8000),
+            code: '',
+            data: JSON.stringify({
+                _tag: "request_funds",
+                params: [
+                    {
+                        vname: "user_address",
+                        type: "ByStr20",
+                        value: user_address
+                    }
+                ]
+            }),
+            priority: true
+        });
+
+        const callTx = await zilliqa.blockchain.createTransaction(tx);
+        // Retrieving the transaction receipt (See note 2)
+        return callTx.receipt;
+    } catch (error) {
+        throw error;
+    }
+}
+
 const deployFaucet = async () => {
     try {
         const zilliqa = new Zilliqa(process.env.ISOLATED_URL);
@@ -96,6 +134,11 @@ const deployFaucet = async () => {
                 vname: 'zils_per_account',
                 type: 'Uint128',
                 value: `${ZILS_PER_ACCOUNT}`
+            },
+            {
+                vname: 'zils_per_request',
+                type: 'Uint128',
+                value: `${ZILS_PER_REQUEST}`
             },
             {
                 vname: 'blocks_to_wait',
