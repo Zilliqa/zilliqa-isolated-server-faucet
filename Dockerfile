@@ -7,9 +7,10 @@ WORKDIR /faucet
 COPY ./package.json ./
 
 RUN npm install
-RUN npm run build
 
 COPY . ./
+
+RUN npm run build
 
 EXPOSE 5556
 
