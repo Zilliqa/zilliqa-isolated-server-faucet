@@ -2,11 +2,14 @@ FROM node:10
 
 ARG DEPLOY_ENV="dev"
 
-COPY . ./faucet
 WORKDIR /faucet
+
+COPY ./package.json ./
 
 RUN npm install
 RUN npm run build
+
+COPY . ./
 
 EXPOSE 5556
 
