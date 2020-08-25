@@ -10,6 +10,7 @@ import fs from 'fs-extra';
 require('dotenv').config();
 
 const ZILS_PER_ACCOUNT = process.env.ZILS_PER_ACCOUNT;
+const ZILS_PER_REQUEST = process.env.ZILS_PER_REQUEST;
 const DEPOSIT_AMOUNT = process.env.DEPOSIT_AMOUNT;
 const BLOCKS_TO_WAIT = process.env.BLOCKS_TO_WAIT;
 const PRIVATE_KEY = process.env.OWNER_PRIVATEKEY;
@@ -56,7 +57,7 @@ const registerUser = async (user_address) => {
     }
 }
 
-const requestFunds = async (user_address) => {
+const requestFunds = async (user_address,amount) => {
     try {
         const faucetFile = fs.readJSONSync('./faucet-state.json');
 
@@ -80,6 +81,11 @@ const requestFunds = async (user_address) => {
                         vname: "user_address",
                         type: "ByStr20",
                         value: user_address
+                    },
+                    {
+                        vname: "amount",
+                        type: "Uint128",
+                        value: amount
                     }
                 ]
             }),
@@ -215,4 +221,4 @@ const getState = () => {
     return fs.readJSONSync('./faucet-state.json');
 }
 
-export { deployFaucet, registerUser, getState };
+export { deployFaucet, registerUser, requestFunds, getState };

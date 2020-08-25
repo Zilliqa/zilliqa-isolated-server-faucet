@@ -28,9 +28,10 @@ app.post('/register-account', async (req, res) => {
 
 app.post('/request-funds', async (req, res) => {
     const address = req.body.address;
+    const amount = req.body.amount || process.env.ZILS_PER_REQUEST;
 
     try {
-        const result = await requestFunds(address);
+        const result = await requestFunds(address, amount);
         return res.send(result);
     } catch (error) {
         return res.send(error);
