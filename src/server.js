@@ -39,7 +39,7 @@ app.get('/faucet-state', (req, res) => {
 app.listen(FAUCET_PORT, () => console.log(`Faucet listening on port ${FAUCET_PORT}!`))
 
 // Check if faucet contract exists, if not, deploy one.
-if (!fs.existsSync('./faucet-state.json')) {
+if (!fs.existsSync('./state/faucet-state.json')) {
     console.log('Faucet state file does not exist. Deploying new contract...');
 
     deployFaucet();

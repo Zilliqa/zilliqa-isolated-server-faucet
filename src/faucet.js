@@ -20,7 +20,7 @@ const VERSION = bytes.pack(chainId, msgVersion);
 
 const registerUser = async (user_address) => {
     try {
-        const faucetFile = fs.readJSONSync('./faucet-state.json');
+        const faucetFile = fs.readJSONSync('./state/faucet-state.json');
 
         const zilliqa = new Zilliqa(process.env.ISOLATED_URL);
 
@@ -158,7 +158,7 @@ const deployFaucet = async () => {
         console.log('The state of the contract is:');
         console.log(JSON.stringify(state.result, null, 4));
 
-        fs.writeJSONSync('./faucet-state.json', {
+        fs.writeJSONSync('./state/faucet-state.json', {
             contractAddress: contractAddress,
             depositState: state.result
         });
@@ -169,7 +169,7 @@ const deployFaucet = async () => {
 }
 
 const getState = () => {
-    return fs.readJSONSync('./faucet-state.json');
+    return fs.readJSONSync('./state/faucet-state.json');
 }
 
 export { deployFaucet, registerUser, getState };
