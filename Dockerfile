@@ -17,4 +17,4 @@ RUN mkdir -p /faucet/state
 EXPOSE 5556
 
 ENV DEPLOY_ENV=${DEPLOY_ENV}
-ENTRYPOINT ["sh", "run_server.sh"]
+ENTRYPOINT ["bash", "run_server.sh"]
