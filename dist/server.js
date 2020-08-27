@@ -78,7 +78,7 @@ app.listen(FAUCET_PORT, function () {
 });
 
 // Check if faucet contract exists, if not, deploy one.
-if (!_fsExtra2.default.existsSync('./faucet-state.json')) {
+if (!_fsExtra2.default.existsSync('./state/faucet-state.json')) {
     console.log('Faucet state file does not exist. Deploying new contract...');
 
     (0, _faucet.deployFaucet)();

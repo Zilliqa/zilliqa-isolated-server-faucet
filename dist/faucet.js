@@ -40,7 +40,7 @@ var registerUser = function () {
                 switch (_context.prev = _context.next) {
                     case 0:
                         _context.prev = 0;
-                        faucetFile = _fsExtra2.default.readJSONSync('./faucet-state.json');
+                        faucetFile = _fsExtra2.default.readJSONSync('./state/faucet-state.json');
                         zilliqa = new _zilliqa.Zilliqa(process.env.ISOLATED_URL);
 
 
@@ -221,7 +221,7 @@ var deployFaucet = function () {
                         console.log('The state of the contract is:');
                         console.log(JSON.stringify(state.result, null, 4));
 
-                        _fsExtra2.default.writeJSONSync('./faucet-state.json', {
+                        _fsExtra2.default.writeJSONSync('./state/faucet-state.json', {
                             contractAddress: contractAddress,
                             depositState: state.result
                         });
@@ -249,7 +249,7 @@ var deployFaucet = function () {
 }();
 
 var getState = function getState() {
-    return _fsExtra2.default.readJSONSync('./faucet-state.json');
+    return _fsExtra2.default.readJSONSync('./state/faucet-state.json');
 };
 
 exports.deployFaucet = deployFaucet;
