@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.getState = exports.registerUser = exports.deployFaucet = undefined;
+exports.getState = exports.requestFunds = exports.registerUser = exports.deployFaucet = undefined;
 
 require('babel-polyfill');
 
@@ -24,6 +24,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 require('dotenv').config();
 
 var ZILS_PER_ACCOUNT = process.env.ZILS_PER_ACCOUNT;
+var ZILS_PER_REQUEST = process.env.ZILS_PER_REQUEST;
 var DEPOSIT_AMOUNT = process.env.DEPOSIT_AMOUNT;
 var BLOCKS_TO_WAIT = process.env.BLOCKS_TO_WAIT;
 var PRIVATE_KEY = process.env.OWNER_PRIVATEKEY;
@@ -69,22 +70,19 @@ var registerUser = function () {
 
                     case 8:
                         callTx = _context.sent;
-
-                        console.log(callTx);
-                        // Retrieving the transaction receipt (See note 2)
                         return _context.abrupt('return', callTx.receipt);
 
-                    case 13:
-                        _context.prev = 13;
+                    case 12:
+                        _context.prev = 12;
                         _context.t0 = _context['catch'](0);
                         throw _context.t0;
 
-                    case 16:
+                    case 15:
                     case 'end':
                         return _context.stop();
                 }
             }
-        }, _callee, undefined, [[0, 13]]);
+        }, _callee, undefined, [[0, 12]]);
     }));
 
     return function registerUser(_x) {
@@ -92,14 +90,75 @@ var registerUser = function () {
     };
 }();
 
-var deployFaucet = function () {
-    var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-        var zilliqa, address, balance, minGasPrice, myGasPrice, isGasSufficient, code, init, tx, deployTx, contractId, contractAddress, newtx, callTx, state;
+var requestFunds = function () {
+    var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(user_address, amount) {
+        var faucetFile, zilliqa, myGasPrice, tx, callTx;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
                 switch (_context2.prev = _context2.next) {
                     case 0:
                         _context2.prev = 0;
+                        faucetFile = _fsExtra2.default.readJSONSync('./faucet-state.json');
+                        zilliqa = new _zilliqa.Zilliqa(process.env.ISOLATED_URL);
+
+
+                        zilliqa.wallet.addByPrivateKey(PRIVATE_KEY);
+
+                        myGasPrice = _util.units.toQa('1000', _util.units.Units.Li);
+                        tx = zilliqa.transactions.new({
+                            version: VERSION,
+                            toAddr: faucetFile.contractAddress,
+                            amount: new _util.BN(0),
+                            gasPrice: myGasPrice, // in Qa
+                            gasLimit: _util.Long.fromNumber(8000),
+                            code: '',
+                            data: JSON.stringify({
+                                _tag: "request_funds",
+                                params: [{
+                                    vname: "user_address",
+                                    type: "ByStr20",
+                                    value: user_address
+                                }, {
+                                    vname: "amount",
+                                    type: "Uint128",
+                                    value: amount
+                                }]
+                            }),
+                            priority: true
+                        });
+                        _context2.next = 8;
+                        return zilliqa.blockchain.createTransaction(tx);
+
+                    case 8:
+                        callTx = _context2.sent;
+                        return _context2.abrupt('return', callTx.receipt);
+
+                    case 12:
+                        _context2.prev = 12;
+                        _context2.t0 = _context2['catch'](0);
+                        throw _context2.t0;
+
+                    case 15:
+                    case 'end':
+                        return _context2.stop();
+                }
+            }
+        }, _callee2, undefined, [[0, 12]]);
+    }));
+
+    return function requestFunds(_x2, _x3) {
+        return _ref2.apply(this, arguments);
+    };
+}();
+
+var deployFaucet = function () {
+    var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+        var zilliqa, address, balance, minGasPrice, myGasPrice, isGasSufficient, code, init, tx, deployTx, contractId, contractAddress, newtx, callTx, state;
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+            while (1) {
+                switch (_context3.prev = _context3.next) {
+                    case 0:
+                        _context3.prev = 0;
                         zilliqa = new _zilliqa.Zilliqa(process.env.ISOLATED_URL);
 
                         zilliqa.wallet.addByPrivateKey(PRIVATE_KEY);
@@ -108,16 +167,16 @@ var deployFaucet = function () {
 
                         console.log('account address is: ' + address);
                         // Get Balance
-                        _context2.next = 7;
+                        _context3.next = 7;
                         return zilliqa.blockchain.getBalance(address);
 
                     case 7:
-                        balance = _context2.sent;
-                        _context2.next = 10;
+                        balance = _context3.sent;
+                        _context3.next = 10;
                         return zilliqa.blockchain.getMinimumGasPrice();
 
                     case 10:
-                        minGasPrice = _context2.sent;
+                        minGasPrice = _context3.sent;
 
 
                         // Account balance (See note 1)
@@ -148,6 +207,10 @@ var deployFaucet = function () {
                             type: 'Uint128',
                             value: '' + ZILS_PER_ACCOUNT
                         }, {
+                            vname: 'zils_per_request',
+                            type: 'Uint128',
+                            value: '' + ZILS_PER_REQUEST
+                        }, {
                             vname: 'blocks_to_wait',
                             type: 'Uint128',
                             value: '' + BLOCKS_TO_WAIT
@@ -162,16 +225,16 @@ var deployFaucet = function () {
                             data: JSON.stringify(init).replace(/\\"/g, '"'),
                             priority: true
                         });
-                        _context2.next = 24;
+                        _context3.next = 24;
                         return zilliqa.blockchain.createTransaction(tx);
 
                     case 24:
-                        deployTx = _context2.sent;
-                        _context2.next = 27;
+                        deployTx = _context3.sent;
+                        _context3.next = 27;
                         return zilliqa.blockchain.getContractAddressFromTransactionID(deployTx.id);
 
                     case 27:
-                        contractId = _context2.sent;
+                        contractId = _context3.sent;
 
 
                         // Introspect the state of the underlying transaction
@@ -200,11 +263,11 @@ var deployFaucet = function () {
                             }),
                             priority: true
                         });
-                        _context2.next = 38;
+                        _context3.next = 38;
                         return zilliqa.blockchain.createTransaction(newtx);
 
                     case 38:
-                        callTx = _context2.sent;
+                        callTx = _context3.sent;
 
 
                         // Retrieving the transaction receipt (See note 2)
@@ -212,11 +275,11 @@ var deployFaucet = function () {
 
                         //Get the contract state
                         console.log('Getting contract state...');
-                        _context2.next = 43;
+                        _context3.next = 43;
                         return zilliqa.blockchain.getSmartContractState(contractAddress);
 
                     case 43:
-                        state = _context2.sent;
+                        state = _context3.sent;
 
                         console.log('The state of the contract is:');
                         console.log(JSON.stringify(state.result, null, 4));
@@ -226,25 +289,25 @@ var deployFaucet = function () {
                             depositState: state.result
                         });
                         console.log('Faucet contract successfully deployed.');
-                        _context2.next = 53;
+                        _context3.next = 53;
                         break;
 
                     case 50:
-                        _context2.prev = 50;
-                        _context2.t0 = _context2['catch'](0);
+                        _context3.prev = 50;
+                        _context3.t0 = _context3['catch'](0);
 
-                        console.log(_context2.t0);
+                        console.log(_context3.t0);
 
                     case 53:
                     case 'end':
-                        return _context2.stop();
+                        return _context3.stop();
                 }
             }
-        }, _callee2, undefined, [[0, 50]]);
+        }, _callee3, undefined, [[0, 50]]);
     }));
 
     return function deployFaucet() {
-        return _ref2.apply(this, arguments);
+        return _ref3.apply(this, arguments);
     };
 }();
 
@@ -254,4 +317,5 @@ var getState = function getState() {
 
 exports.deployFaucet = deployFaucet;
 exports.registerUser = registerUser;
+exports.requestFunds = requestFunds;
 exports.getState = getState;

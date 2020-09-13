@@ -92,7 +92,7 @@ transition register_user(user_address: ByStr20)
     send msgs
 end
 
-transition request_funds(user_address: ByStr20)
+transition request_funds(user_address: ByStr20, amount: Uint128)
   user_exists <- exists users[user_address];
   blk <- & BLOCKNUMBER;
     users[user_address] := blk;
@@ -100,7 +100,7 @@ transition request_funds(user_address: ByStr20)
     event e;
     msg = {_tag: "";
             _recipient: user_address;
-            _amount: zils_per_account;
+            _amount: amount;
             code: registered_success_code };
     msgs = one_msg msg;
     send msgs
