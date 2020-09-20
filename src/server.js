@@ -1,11 +1,11 @@
 import 'babel-polyfill';
-import express from "express";
-import bodyParser from "body-parser";
-import fs from "fs-extra";
+import express from 'express';
+import bodyParser from 'body-parser';
+import fs from 'fs-extra';
 import { registerUser, requestFunds, deployFaucet, getState } from './faucet';
-import cors from "cors";
+import cors from 'cors';
 
-require('dotenv').config()
+require('dotenv').config();
 
 const FAUCET_PORT = process.env.FAUCET_PORT;
 
@@ -16,48 +16,47 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.post('/register-account', async (req, res) => {
-    const address = req.body.address;
+  const address = req.body.address;
 
-    try {
-        const result = await registerUser(address);
-        return res.send(result);
-    } catch (error) {
-        return res.send(error);
-    }
+  try {
+    const result = await registerUser(address);
+    return res.send(result);
+  } catch (error) {
+    return res.send(error);
+  }
 });
 
 app.post('/request-funds', async (req, res) => {
-    const address = req.body.address;
-    const amount = req.body.amount || process.env.ZILS_PER_REQUEST;
+  const address = req.body.address;
+  const amount = req.body.amount || process.env.ZILS_PER_REQUEST;
 
-    try {
-        const result = await requestFunds(address, amount);
-        return res.send(result);
-    } catch (error) {
-        return res.send(error);
-    }
+  try {
+    const result = await requestFunds(address, amount);
+    return res.send(result);
+  } catch (error) {
+    return res.send(error);
+  }
 });
 
 app.get('/faucet-state', (req, res) => {
-    try {
-        const state = getState();
+  try {
+    const state = getState();
 
-        return res.send(state);
-    } catch (error) {
-        return res.send(error);
-    }
+    return res.send(state);
+  } catch (error) {
+    return res.send(error);
+  }
 });
 
-app.listen(FAUCET_PORT, () => console.log(`Faucet listening on port ${FAUCET_PORT}!`))
+app.listen(FAUCET_PORT, () => console.log(`Faucet listening on port ${FAUCET_PORT}!`));
 
 // Check if faucet contract exists, if not, deploy one.
 if (!fs.existsSync('./faucet-state.json')) {
-    console.log('Faucet state file does not exist. Deploying new contract...');
+  console.log('Faucet state file does not exist. Deploying new contract...');
 
-    deployFaucet();
+  deployFaucet();
 } else {
-    console.log('Faucet state:');
-    const state = getState();
-    console.log(state);
+  console.log('Faucet state:');
+  const state = getState();
+  console.log(state);
 }
-
