@@ -1,22 +1,20 @@
-"use strict";
+'use strict';
 
-require("babel-polyfill");
+require('babel-polyfill');
 
-var _express = require("express");
+var _express = require('express');
 
 var _express2 = _interopRequireDefault(_express);
 
-var _bodyParser = require("body-parser");
+var _bodyParser = require('body-parser');
 
 var _bodyParser2 = _interopRequireDefault(_bodyParser);
 
-var _fsExtra = require("fs-extra");
+var _faucet = require('./faucet');
 
-var _fsExtra2 = _interopRequireDefault(_fsExtra);
+var _faucet2 = _interopRequireDefault(_faucet);
 
-var _faucet = require("./faucet");
-
-var _cors = require("cors");
+var _cors = require('cors');
 
 var _cors2 = _interopRequireDefault(_cors);
 
@@ -34,96 +32,87 @@ app.use((0, _cors2.default)());
 app.use(_bodyParser2.default.urlencoded({ extended: false }));
 app.use(_bodyParser2.default.json());
 
+var faucet = new _faucet2.default();
+
 app.post('/register-account', function () {
-    var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res) {
-        var address, result;
-        return regeneratorRuntime.wrap(function _callee$(_context) {
-            while (1) {
-                switch (_context.prev = _context.next) {
-                    case 0:
-                        address = req.body.address;
-                        _context.prev = 1;
-                        _context.next = 4;
-                        return (0, _faucet.registerUser)(address);
+  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res) {
+    var address, date, result;
+    return regeneratorRuntime.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            address = req.body.address;
+            _context.prev = 1;
+            date = new Date();
 
-                    case 4:
-                        result = _context.sent;
-                        return _context.abrupt("return", res.send(result));
+            console.log('[' + date.toUTCString() + '] Register address ' + address + '.');
+            _context.next = 6;
+            return faucet.registerUser(address);
 
-                    case 8:
-                        _context.prev = 8;
-                        _context.t0 = _context["catch"](1);
-                        return _context.abrupt("return", res.send(_context.t0));
+          case 6:
+            result = _context.sent;
 
-                    case 11:
-                    case "end":
-                        return _context.stop();
-                }
-            }
-        }, _callee, undefined, [[1, 8]]);
-    }));
+            faucet.saveState();
+            return _context.abrupt('return', res.json(result));
 
-    return function (_x, _x2) {
-        return _ref.apply(this, arguments);
-    };
+          case 11:
+            _context.prev = 11;
+            _context.t0 = _context['catch'](1);
+            return _context.abrupt('return', res.json({ error: _context.t0.message }));
+
+          case 14:
+          case 'end':
+            return _context.stop();
+        }
+      }
+    }, _callee, undefined, [[1, 11]]);
+  }));
+
+  return function (_x, _x2) {
+    return _ref.apply(this, arguments);
+  };
 }());
 
 app.post('/request-funds', function () {
-    var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res) {
-        var address, amount, result;
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
-            while (1) {
-                switch (_context2.prev = _context2.next) {
-                    case 0:
-                        address = req.body.address;
-                        amount = req.body.amount || process.env.ZILS_PER_REQUEST;
-                        _context2.prev = 2;
-                        _context2.next = 5;
-                        return (0, _faucet.requestFunds)(address, amount);
+  var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res) {
+    var address, amount, date, result;
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            address = req.body.address;
+            amount = req.body.amount || process.env.ZILS_PER_REQUEST;
+            _context2.prev = 2;
+            date = new Date();
 
-                    case 5:
-                        result = _context2.sent;
-                        return _context2.abrupt("return", res.send(result));
+            console.log('[' + date.toUTCString() + '] Request funds for ' + address + '. Amount ' + amount);
+            _context2.next = 7;
+            return faucet.requestFunds(address, amount);
 
-                    case 9:
-                        _context2.prev = 9;
-                        _context2.t0 = _context2["catch"](2);
-                        return _context2.abrupt("return", res.send(_context2.t0));
+          case 7:
+            result = _context2.sent;
 
-                    case 12:
-                    case "end":
-                        return _context2.stop();
-                }
-            }
-        }, _callee2, undefined, [[2, 9]]);
-    }));
+            faucet.saveState();
+            return _context2.abrupt('return', res.json(result));
 
-    return function (_x3, _x4) {
-        return _ref2.apply(this, arguments);
-    };
+          case 12:
+            _context2.prev = 12;
+            _context2.t0 = _context2['catch'](2);
+            return _context2.abrupt('return', res.json({ error: _context2.t0.message }));
+
+          case 15:
+          case 'end':
+            return _context2.stop();
+        }
+      }
+    }, _callee2, undefined, [[2, 12]]);
+  }));
+
+  return function (_x3, _x4) {
+    return _ref2.apply(this, arguments);
+  };
 }());
 
-app.get('/faucet-state', function (req, res) {
-    try {
-        var state = (0, _faucet.getState)();
-
-        return res.send(state);
-    } catch (error) {
-        return res.send(error);
-    }
-});
-
 app.listen(FAUCET_PORT, function () {
-    return console.log("Faucet listening on port " + FAUCET_PORT + "!");
+  return console.log('Faucet listening on port ' + FAUCET_PORT + '!');
 });
-
-// Check if faucet contract exists, if not, deploy one.
-if (!_fsExtra2.default.existsSync('./faucet-state.json')) {
-    console.log('Faucet state file does not exist. Deploying new contract...');
-
-    (0, _faucet.deployFaucet)();
-} else {
-    console.log('Faucet state:');
-    var state = (0, _faucet.getState)();
-    console.log(state);
-}

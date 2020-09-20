@@ -6,5 +6,6 @@ if [ "$DEPLOY_ENV" = "dev" ]; then
     node ./dist/server.js
 else
     echo "Not dev env"
+    [ -e ./.env ] && . ./.env
     node ./dist/server.js
 fi
