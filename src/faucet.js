@@ -13,7 +13,7 @@ const ISOLATED_URL = process.env.ISOLATED_URL;
 
 class Faucet {
   constructor() {
-    this.chainId = 1; // chainId of the developer testnet
+    this.chainId = 222; // chainId of the developer testnet
     this.msgVersion = 1; // current msgVersion
     this.VERSION = bytes.pack(this.chainId, this.msgVersion);
     this.state = [];
