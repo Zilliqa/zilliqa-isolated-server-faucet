@@ -16,4 +16,4 @@ registryURL=${accountID}.dkr.ecr.${regionID}.amazonaws.com/$application
 
 eval "$(aws ecr get-login --no-include-email --region $regionID)"
 docker build --build-arg DEPLOY_ENV="stg" -t "$registryURL:latest" -t "$registryURL:$commit" .
-docker push "$registryURL"
+#docker push "$registryURL"
