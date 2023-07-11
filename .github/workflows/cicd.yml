@@ -15,23 +15,17 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Configure AWS Credentials
-      uses: Zilliqa/gh-actions-workflows/actions/configure-aws-credentials@v1
+    - name: Docker build and push
+      uses: Zilliqa/gh-actions-workflows/actions/ci-dockerized-app-build-push@v1
       with:
+        file: Dockerfile
+        build-args: "DEPLOY_ENV=stg"
+        tag: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/zilliqa-isolated-server-faucet
+        tag-length: 7
+        push: ${{ github.ref_name == github.event.repository.default_branch }}
+        tag-latest: ${{ github.ref_name == github.event.repository.default_branch }}
+        registry: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
         aws-region: ${{ secrets.AWS_REGION }}
         role-to-assume: ${{ secrets.ECR_DEPLOYER_ROLE }}
         oidc-role: ${{ secrets.OIDC_ROLE }}
-    - name: Split image and tag
-      env:
-        TRAVIS_COMMIT: ${{ github.sha }}
-      run: |
-        ./scripts/ci_build.sh
-      shell: bash
-    - name: Split image and tag
-      if: ${{ github.ref_name == github.event.repository.default_branch }}
-      run: |
-        IFS=':'
-        read -ra ADDR <<< "${{ inputs.tag }}"
-        echo "image=${ADDR[0]}" >> $GITHUB_OUTPUT
-        echo "tag=${ADDR[1]}" >> $GITHUB_OUTPUT
-      shell: bash
+        cache-key: 'zilliqa-isolated-server-faucet'
